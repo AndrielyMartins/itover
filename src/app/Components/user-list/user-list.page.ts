@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { UserService } from '../../../backend/Service/user.service';
 import { Router } from '@angular/router';
+import { MenuController } from '@ionic/angular';
 
 @Component({
   selector: 'app-user-list',
@@ -11,7 +12,11 @@ import { Router } from '@angular/router';
 export class UserListPage implements OnInit {
   users: any[] = [];
 
-  constructor(private userService: UserService, private router: Router) { }
+  constructor(
+    private userService: UserService, 
+    private router: Router,
+    private menuCtrl: MenuController
+  ) {}
 
   ngOnInit() {
     this.loadUsers();
@@ -19,31 +24,33 @@ export class UserListPage implements OnInit {
 
   // Método para carregar usuários
   loadUsers() {
-  this.userService.getUsers().subscribe({
-    next: (response) => {
-      console.log('Dados recebidos:', response); // 👀 Verifique se os dados aparecem no console
+    this.userService.getUsers().subscribe(response => {
       this.users = response;
-    },
-    error: (error) => {
-      console.error('Erro ao buscar usuários:', error);
-    }
-  });
-}
-
-  // Método para deletar um usuário
-  deleteUser(id: number) {
-    this.userService.deleteUser(id).subscribe(response => {
-      console.log('Usuário deletado:', response);
-      this.loadUsers(); // Atualizar lista após exclusão
     });
   }
 
-   goToUserForm(userId?: number) {
-  if (userId) {
-    this.router.navigate(['/user-form', userId]); // Redireciona para edição
-  } else {
-    this.router.navigate(['/user-form']); // Redireciona para criação
+  // Método para deletar um usuário
+  deleteUser(id: number) {
+    this.userService.deleteUser(id).subscribe({
+      next: () => {
+        console.log('Usuário deletado com sucesso');
+        this.loadUsers(); // Recarrega a lista após deletar
+      },
+      error: (error) => {
+        console.error('Erro ao deletar usuário:', error);
+      }
+    });
   }
-}
 
+  goToUserForm(id?: number) {
+    if (id) {
+      this.router.navigate(['/user-form', id]);
+    } else {
+      this.router.navigate(['/user-form']);
+    }
+  }
+
+  async toggleMenu() {
+    await this.menuCtrl.toggle();
+  }
 }

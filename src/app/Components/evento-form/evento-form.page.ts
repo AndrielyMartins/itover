@@ -52,4 +52,9 @@ export class EventoFormPage implements OnInit {
       });
     }
   }
+
+  // Função para cancelar e voltar para a lista de eventos
+  cancelar() {
+    this.router.navigate(['/evento-list']);
+  }
 }
